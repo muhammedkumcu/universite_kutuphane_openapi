@@ -1,0 +1,151 @@
+openapi: 3.0.3
+info:
+  title: Üniversite Çevrimiçi Kütüphane API
+  version: 1.0.0
+  description: Bu API, üniversitenin çevrim içi kütüphane sistemini yönetmek için
+    hazırlanmıştır. Kitap, öğrenci ve ödünç alma işlemleri için gerekli tüm CRUD işlemlerini
+    içerir.
+  contact:
+    name: Kütüphane API Destek
+    email: destek@uni-kutup.edu.tr
+servers:
+- url: https://api.uni-kutup.edu.tr/v1
+  description: Canlı API Sunucusu
+- url: https://sandbox.uni-kutup.edu.tr/v1
+  description: Test Sunucusu
+tags:
+- name: Books
+  description: Kitap yönetimi için işlemler
+- name: Students
+  description: Öğrenci kayıt ve yönetimi
+- name: Loans
+  description: Kitap ödünç alma ve iade işlemleri
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+          format: isbn-13
+        publisher:
+          type: string
+        pageCount:
+          type: integer
+        stock:
+          type: integer
+      required:
+      - id
+      - title
+      - author
+      - isbn
+      - publisher
+      - pageCount
+      - stock
+    Student:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        studentNumber:
+          type: string
+        email:
+          type: string
+          format: email
+        isActive:
+          type: boolean
+      required:
+      - id
+      - name
+      - studentNumber
+      - email
+      - isActive
+    Loan:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        bookId:
+          type: string
+          format: uuid
+        loanDate:
+          type: string
+          format: date
+        returnDate:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum:
+          - ongoing
+          - returned
+          - late
+      required:
+      - id
+      - studentId
+      - bookId
+      - loanDate
+      - status
+  parameters:
+    BookIdParam:
+      name: id
+      in: path
+      required: true
+      description: Kitabın benzersiz kimliği (UUID)
+      schema:
+        type: string
+        format: uuid
+    PageParam:
+      name: page
+      in: query
+      description: 'Sayfa numarası (varsayılan: 1)'
+      schema:
+        type: integer
+        default: 1
+    SizeParam:
+      name: size
+      in: query
+      description: 'Sayfa başına kayıt sayısı (varsayılan: 10)'
+      schema:
+        type: integer
+        default: 10
+  responses:
+    NotFound:
+      description: Kaynak bulunamadı
+      content:
+        application/json:
+          example:
+            message: İstenilen kaynak bulunamadı.
+    BadRequest:
+      description: Geçersiz istek
+      content:
+        application/json:
+          example:
+            message: Geçersiz istek parametreleri.
+    InternalError:
+      description: Sunucu hatası
+      content:
+        application/json:
+          example:
+            message: Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+paths: {}
